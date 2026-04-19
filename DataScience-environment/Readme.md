@@ -6,6 +6,53 @@ This project provides a fully containerized Python environment using Docker. It 
 - NumPy
 - Pandas
 
+# MLflow + JupyterLab + FastAPI stack
+
+## 🇬🇧 Overview
+
+This repository provides a reproducible environment for:
+
+- Experiment tracking with **MLflow** (PostgreSQL backend, artifact store on volume)
+- Interactive development with **JupyterLab**
+- Model serving with **FastAPI** using MLflow models
+
+The stack is orchestrated with **Docker Compose** and is suitable as a solid starting point for production-like workflows.
+
+---
+
+## 🇬🇧 Architecture
+
+- **JupyterLab**  
+  Interactive notebooks for experimentation, training, and logging runs to MLflow.
+
+- **PostgreSQL**  
+  MLflow backend store for runs, metrics, parameters, and model registry.
+
+- **MLflow server**  
+  Central tracking server and model registry, exposing the UI on port `5000`.
+
+- **FastAPI**  
+  Lightweight API layer to serve MLflow models in real time.
+
+---
+
+## 🇬🇧 Prerequisites
+
+- Docker
+- Docker Compose
+- Environment variables (example):
+  - `WORKSPACE_DIR`
+  - `REPO_DIR`
+  - `TEMP_DIR`
+
+---
+
+## 🇬🇧 How to run
+
+```bash
+docker compose up --build
+
+
 Automatic mounting of a Windows directory for persistent notebooks
 
 Custom external port (8887)
@@ -16,12 +63,17 @@ The environment is designed for local development on Windows while keeping all d
 
 ## Project Structure
 ```Code
-project-root/
+project/
 │
-├── JupiterLab
-├─── Dockerfile
-├─── requirements.txt
-└── docker-compose.yml
+├── docker-compose.yml
+├── .env
+├── JupyterLab/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── workspace/          ← código activo
+├── repoML/             ← repositorios o datasets
+└── temps/              ← archivos temporales
 ```
 ### Your actual notebooks live in your Windows directory:
 
@@ -71,6 +123,7 @@ These files correspond directly to your Windows folder:
 D:\Users\<USER>\Documents\MyDocsPersonales\myJupyterFiles
 ```
 Any changes you make in JupyterLab are saved on your PC.
+If you need to modify your workspace root path, you can do it from docker-compose.yml
 
 ---
 
@@ -88,5 +141,7 @@ Edit requirements.txt
 Rebuild the container:
 
 ```powershell
-docker compose up --build
+docker compose build --no-cache
+docker compose up -d
+
 ```

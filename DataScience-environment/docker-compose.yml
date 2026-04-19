@@ -10,9 +10,63 @@ services:
     ports:
       - "8887:8888"
     volumes:
-      - "D:/Users/JSilvaZuniga/Documents/MyDocsPersonales/Cursos/Phyton/Nuclio:/workspace"
+      - ${WORKSPACE_DIR}:/workspace
+      - ${REPO_DIR}:/workspace_repoML
+      - ${TEMP_DIR}:/workspace-temps
+    working_dir: /workspace_repoML
     command: >
       jupyter lab
       --ip=0.0.0.0
       --no-browser
       --allow-root
+    depends_on:
+      - mlflow
+      - db
+
+  db:
+    image: postgres:16
+    container_name: mlflow_db
+    environment:
+      - POSTGRES_USER=mlflow
+      - POSTGRES_PASSWORD=mlflow_pwd
+      - POSTGRES_DB=mlflow_db
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow
+    depends_on:
+      - db
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=postgresql://mlflow:mlflow_pwd@db:5432/mlflow_db
+      - MLFLOW_ARTIFACT_ROOT=/mlflow_artifacts
+    volumes:
+      - ./mlflow_artifacts:/mlflow_artifacts
+    ports:
+      - "5000:5000"
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://mlflow:mlflow_pwd@db:5432/mlflow_db
+      --default-artifact-root /mlflow_artifacts
+      --host 0.0.0.0
+      --port 5000
+
+  fastapi:
+    build: ./fastapi
+    container_name: fastapi-ml
+    depends_on:
+      - mlflow
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${REPO_DIR}:/app
+    working_dir: /app
+    command: >
+      uvicorn api:app
+      --host 0.0.0.0
+      --port 8000

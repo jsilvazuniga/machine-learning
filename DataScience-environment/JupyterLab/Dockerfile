@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /workspace
+# WORKDIR /workspace
 
 # Optional: system tools for scientific libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,6 +12,11 @@ COPY requirements.txt .
 
 # Install all Python dependencies (JupyterLab included)
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Create symlinks in /root so JupyterLab shows your volumes in the main view
+RUN ln -s /workspace /root/workspace \
+    && ln -s /workspace_repoML /root/repoML \
+    && ln -s /workspace-temps /root/temps
 
 EXPOSE 8888
 
