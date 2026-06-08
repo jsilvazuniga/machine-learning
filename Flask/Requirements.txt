@@ -1,0 +1,6 @@
+ipykernel
+fastapi
+uvicorn
+debugpy
+numpy
+flask
