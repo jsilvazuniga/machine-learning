@@ -1,0 +1,20 @@
+<h2>
+Your score is {{ results.score }} and you have {{ results.result }}.
+</h2>
+
+<table>
+    {% for key, value in results.items() %}
+    <tr>
+        <th>{{ key }}</th>
+        <td>{{ value }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br/>   
+
+{% if results.score >= 50 %}
+    <h3>Congratulations! You passed the test.</h3>
+{% else %}
+    <h3>Sorry, you failed the test. Better luck next time!</h3>
+{% endif %}

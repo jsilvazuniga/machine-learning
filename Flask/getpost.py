@@ -29,5 +29,18 @@ def contact():
         return f"Name: {name}, Email: {email}, Message: {message}"
     return render_template("form_contact.html")
 
+@app.route("/submit", methods=['GET', 'POST'])
+def submit():
+    if request.method == 'POST':
+        # Handle form submission here
+        print("Form submitted!")
+        print(request.form)  # Print the form data to the console
+        name=request.form['name']
+        email=request.form['email']
+        message=request.form['message']
+        # For now, just print the form data to the console
+        return f"Name: {name}, Email: {email}, Message: {message}"
+    return render_template("form_contact.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
